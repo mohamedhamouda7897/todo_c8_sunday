@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:todo_c8_sunday/models/task_model.dart';
+import 'package:todo_c8_sunday/shared/network/firebase/firebase_functions.dart';
 import 'package:todo_c8_sunday/shared/styles/app_colors.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
@@ -8,8 +10,9 @@ class AddTaskBottomSheet extends StatefulWidget {
 
 class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   var formKey = GlobalKey<FormState>();
-  String selected = DateTime.now().toString().substring(0, 10);
-
+  var selected =DateUtils.dateOnly(DateTime.now()) ;
+  var titleController=TextEditingController();
+  var descriptionController=TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -30,6 +33,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
               height: 25,
             ),
             TextFormField(
+              controller: titleController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return "Please Enter Task title";
@@ -52,6 +56,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
               height: 15,
             ),
             TextFormField(
+              controller:descriptionController ,
               maxLines: 3,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -87,7 +92,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                 chooseDate();
               },
               child: Text(
-                selected,
+                selected.toString().substring(0,10),
                 style: Theme.of(context)
                     .textTheme
                     .bodyLarge!
@@ -100,7 +105,14 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
             ElevatedButton(
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
-                    print("Route C8 Sunday");
+                    TaskModel task = TaskModel(
+                        title:titleController.text ,
+                        description: descriptionController.text,
+                        date:selected.millisecondsSinceEpoch ,
+                        status: false);
+                    FireBaseFunctions.addTaskToFirestore(task).then((value){
+                      Navigator.pop(context);
+                    });
                   }
                 },
                 child: const Text("Add Task"))
@@ -117,7 +129,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
         firstDate: DateTime.now().subtract(Duration(days: 365 * 10)),
         lastDate: DateTime.now().add(Duration(days: 365)));
     if (selectedDate != null) {
-      selected = selectedDate.toString().substring(0, 10);
+      selected = DateUtils.dateOnly(selectedDate);
       setState(() {});
     }
   }
