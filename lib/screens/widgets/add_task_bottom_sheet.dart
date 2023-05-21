@@ -10,9 +10,11 @@ class AddTaskBottomSheet extends StatefulWidget {
 
 class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   var formKey = GlobalKey<FormState>();
-  var selected =DateUtils.dateOnly(DateTime.now()) ;
-  var titleController=TextEditingController();
-  var descriptionController=TextEditingController();
+  var selected = DateUtils.dateOnly(DateTime.now());
+
+  var titleController = TextEditingController();
+  var descriptionController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -56,7 +58,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
               height: 15,
             ),
             TextFormField(
-              controller:descriptionController ,
+              controller: descriptionController,
               maxLines: 3,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -92,7 +94,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                 chooseDate();
               },
               child: Text(
-                selected.toString().substring(0,10),
+                selected.toString().substring(0, 10),
                 style: Theme.of(context)
                     .textTheme
                     .bodyLarge!
@@ -106,13 +108,12 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     TaskModel task = TaskModel(
-                        title:titleController.text ,
+                        title: titleController.text,
                         description: descriptionController.text,
-                        date:selected.millisecondsSinceEpoch ,
+                        date: selected.millisecondsSinceEpoch,
                         status: false);
-                    FireBaseFunctions.addTaskToFirestore(task).then((value){
-                      Navigator.pop(context);
-                    });
+                    FireBaseFunctions.addTaskToFirestore(task);
+                    Navigator.pop(context);
                   }
                 },
                 child: const Text("Add Task"))
